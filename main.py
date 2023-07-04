@@ -45,4 +45,7 @@ elif args.plot_library == 'plotly':
     fig = go.Figure(data=[go.Scatter3d(x=x, y=y, z=z, mode='markers', marker=dict(size=2))])
     fig.update_layout(scene=dict(xaxis_title='X Label', yaxis_title='Y Label', zaxis_title='Z Label'))
 
+    for trace in fig.data:
+        trace.hovertemplate = "Index: %{pointNumber}"
+
     fig.show()
