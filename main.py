@@ -1,51 +1,53 @@
-import argparse
 import cv2
 import mediapipe as mp
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-import mplcursors
 
-mp_face_mesh = mp.solutions.face_mesh.FaceMesh()
-
-parser = argparse.ArgumentParser(description='Plotting tool')
-parser.add_argument('--plot-library', choices=['matplotlib', 'plotly'], default='matplotlib', help='Choose the plot library (matplotlib or plotly)')
-args = parser.parse_args()
-
-image_path = './face.jpg'
+# Load the image
+image_path = "face.jpg"
 image = cv2.imread(image_path)
 
-image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+# Flip the image vertically
+#image = cv2.flip(image, 0)
 
-results = mp_face_mesh.process(image_rgb)
-face_landmarks = results.multi_face_landmarks[0].landmark
+# Convert the image to RGB format
+image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-x = []
-y = []
-z = []
-landmarks_px = []
-for landmark in face_landmarks:
-    x.append(landmark.x)
-    y.append(landmark.y)
-    z.append(landmark.z)
+# Initialize the MediaPipe FaceMesh model
+mp_face_mesh = mp.solutions.face_mesh
+face_mesh = mp_face_mesh.FaceMesh()
+print(image.shape[0], image.shape[1])
+# Process the image and extract the face landmarks
+results = face_mesh.process(image)
+if results.multi_face_landmarks:
+    fig = go.Figure(data=[go.Image(z=image)])
+
+    for face_landmarks in results.multi_face_landmarks:
+        x_coords = []
+        y_coords = []
+        for landmark in face_landmarks.landmark:
+            x = int(landmark.x * image.shape[1])
+            y = int(landmark.y * image.shape[0])
+            x_coords.append(x)
+            y_coords.append(y)
 
 
-if args.plot_library == 'matplotlib':
-    fig = plt.figure(figsize=(8, 8))
-    ax = fig.add_subplot(111, projection='3d')
-    scatter = ax.scatter(x, y, z)
+        fig.add_trace(go.Scatter(
+            x=x_coords,
+            y=y_coords,
+            mode='markers',
+            marker=dict(size=2, color='lime'),
+            line=dict(color='lime', width=2),
+        ))
 
-    ax.set_xlabel('X Label')
-    ax.set_ylabel('Y Label')
-    ax.set_zlabel('Z Label')
+    fig.update_layout(
+        showlegend=False,
+        xaxis=dict(visible=False, range=[0, image.shape[1]]),
+        yaxis=dict(visible=False, range=[0, image.shape[0]], autorange = 'reversed')
 
-    mplcursors.cursor(hover=True).connect("add", lambda sel: sel.annotation.set_text(f"Index: {sel.target.index}"))
-    plt.show()
-
-elif args.plot_library == 'plotly':
-    fig = go.Figure(data=[go.Scatter3d(x=x, y=y, z=z, mode='markers', marker=dict(size=2))])
-    fig.update_layout(scene=dict(xaxis_title='X Label', yaxis_title='Y Label', zaxis_title='Z Label'))
-
+    )
     for trace in fig.data:
         trace.hovertemplate = "Index: %{pointNumber}"
-
     fig.show()
+else:
+    print("No face landmarks detected.")
+

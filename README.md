@@ -36,7 +36,7 @@
    pip install -r requirements.txt
    ```
 
-   This will install the necessary packages specified in the `requirements.txt` file, including Mediapipe, OpenCV, Matplotlib, and Plotly.
+   This will install the necessary packages specified in the `requirements.txt` file, including Mediapipe, OpenCV and Plotly.
 
 6. Download an image that contains a face and save it in the same directory as the program files. Rename the image as `face.jpg` (or update the `image_path` variable in the code with the correct file path).
 
@@ -45,26 +45,10 @@
 To run the program, use the following command:
 
 ```shell
-python main.py --plot-library [library]
+python main.py
 ```
 
-Replace `[library]` with either `matplotlib` or `plotly` to choose the plotting library.
-
-For example, to visualize the face landmarks using Matplotlib, run:
-
-```shell
-python main.py --plot-library matplotlib
-```
-
-To visualize the face landmarks using Plotly, run:
-
-```shell
-python main.py --plot-library plotly
-```
-
-The program will display a 3D plot showing the face landmarks detected in the image. You can interact with the plot by rotating it or zooming in/out.
-
-If you selected Matplotlib as the plotting library, you can hover over each point to see its index.
+The program will display a 2D plot showing the face landmarks detected in the image. You can interact with the plot by rotating it or zooming in/out.
 
 To exit the program, simply close the plot window.
 
